@@ -1,0 +1,7 @@
+{ "lastLocations": [
+{"subarea": "alpha", "location": [52.294232, 5.625149], "timestamp": "2018-04-23T18:25:43.511Z" },
+{ "subarea": "bravo", "location": [52.172656, 6.227969], "timestamp": "2018-04-23T18:25:43.511Z" }, 
+{ "subarea": "charlie", "location": [51.966335, 6.269892], "timestamp": "2018-04-23T18:25:43.511Z" },
+{ "subarea": "delta", "location": [51.909022, 5.913257], "timestamp": "2018-04-23T18:25:43.511Z" },
+{ "subarea": "echo", "location": [51.876998, 5.709484], "timestamp": "2018-04-23T18:25:43.511Z" },
+{ "subarea": "foxtrot", "location": [51.942269, 5.713051], "timestamp": "2018-04-23T18:25:43.511Z" }]}
