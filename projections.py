@@ -110,7 +110,7 @@ def process(socket, request, group_info, graph):
 		print('[!] Area:', area)
 		# Elapsed time since last seen
 		seconds = (datetime.datetime.now() - datetime.datetime.fromisoformat(entry['timestamp'][:-1])).total_seconds()
-		seconds = 2000
+
 		print('[!] Time since last seen:', seconds, 'sec')
 
 		distances = group_dist(entry['location'], group_info, area)
