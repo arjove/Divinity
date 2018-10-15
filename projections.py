@@ -9,8 +9,8 @@ import os
 import datetime
 import sys
 
-from secrets import GOOGLE_API_KEY
-
+# from secrets import GOOGLE_API_KEY
+GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY')
 gmaps = googlemaps.Client(key=GOOGLE_API_KEY)
 
 AREAS = 'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot'
@@ -61,7 +61,7 @@ def build_and_store_graph(group_info):
 		print("[!] Building graph for area " + area)
 		groups = [group for group in group_info  if group['Subarea']['name'] == area]
 		graph[area] = [[None for _ in range(max_group_id + 1)] for _ in range(max_group_id + 1)]
-		
+
 		for i, x in enumerate(groups):
 			for j, y in enumerate(groups):
 				if i > j:
@@ -69,7 +69,7 @@ def build_and_store_graph(group_info):
 					graph[area][i][j] = directions_result
 					graph[area][j][i] = directions_result
 					print(x['name'], '\t', y['name'], '\t', directions_result[0]['legs'][0]['distance'])
-	
+
 	print("[+] Graph completed")
 
 	print("[!] Storing graph to file graph.dat")
@@ -135,7 +135,7 @@ def process(socket, request, group_info, graph):
 	print('[!] Sending projections')
 	socket.send(json.dumps(projections).encode('utf-8'))
 	print('[+] Projections sent')
-		
+
 def main():
 	# Start listening on port 31337
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
