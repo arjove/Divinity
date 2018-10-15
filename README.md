@@ -1,11 +1,20 @@
 # Catchynaam
 ## API-request
+JSON-request
 {
-	lastLocations: [{
-	'Alpha',
-	[52.23422, 6.828228],
-	'+2 2018-23-23 00:00:00
-	}]
+	lastLocations: [
+	{
+	subarea: 'alpha',
+	location: [52.23422, 6.828228],
+	timestamp: '2018-04-23T18:25:43.511Z'
+	}, 
+	{
+	subarea: 'bravo',
+	location: [52.23422, 6.828228],
+	timestamp: '2018-04-23T18:25:43.511Z'
+	}, 
+	...
+	]
 }
 
 Tristan implementeert: 
