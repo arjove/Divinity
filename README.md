@@ -1,4 +1,7 @@
-# Catchynaam
+# Projections
+Expose port 31337
+Add process env `GOOGLE_API_KEY`.
+
 ## API-request
 JSON-request
 {
@@ -7,19 +10,19 @@ JSON-request
 	subarea: 'alpha',
 	location: [52.23422, 6.828228],
 	timestamp: '2018-04-23T18:25:43.511Z'
-	}, 
+	},
 	{
 	subarea: 'bravo',
 	location: [52.23422, 6.828228],
 	timestamp: '2018-04-23T18:25:43.511Z'
-	}, 
+	},
 	...
 	]
 }
 
-Tristan implementeert: 
+Tristan implementeert:
 incrementVisitCount {
-	
+
 }
 Tristan maakt een tabelletje aan.
 
@@ -27,9 +30,9 @@ Tristan maakt een tabelletje aan.
 ## Groepenvolgorde
 Manual bookkeeping
 
-Snelste route tussen groepen die 0 keer bezocht zijn. 
+Snelste route tussen groepen die 0 keer bezocht zijn.
 
-Complete graaf tussen verschillende groepgebieden. 
+Complete graaf tussen verschillende groepgebieden.
 Vanaf huidige locatie naar dichtsbijzijnde groepen.
 Voor maximaal 3 groepen.
 
@@ -48,7 +51,7 @@ Laatst bekende locatie (hint/hunt) + scoutinggroep
 --> Huidige positie = looptijd van wegen tot de tijd matcht met de huidige tijd.
 -->  return alle locaties (+ route naar dichtsbijzijnde scoutinggroep) in volgorde van kortste route (lat, lng, naam weg).
 
-2 a 3 routes voor de meest waarschijnlijke scoutinggroep 
+2 a 3 routes voor de meest waarschijnlijke scoutinggroep
 + 1 voor de op een na meest waarschijnlijke scoutinggroep
 
 Tristan: google api key
@@ -61,4 +64,4 @@ Cachen (eens per 30 seconden)
 ## URL app aanpassen + gps tracker verder repareren?
 
 
-## 
+##
