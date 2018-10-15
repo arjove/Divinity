@@ -1,4 +1,4 @@
-FROM python:2.7
+FROM python:3.7
 
 WORKDIR /pythonapp
 
@@ -11,4 +11,4 @@ VOLUME /pythonapp
 
 EXPOSE 31337
 
-CMD ["python2.7", "./projections.py"]
+CMD ["python3.7", "./projections.py"]
