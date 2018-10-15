@@ -34,7 +34,7 @@ def handle_connection(client_socket, address, group_info, graph):
 
 	client_socket.close()
 
-def get_group_info():
+def get_and_store_group_info():
 	print("[!] Updating group info...")
 	api_url = "https://www.eej.moe/api/{0}".format("group")
 
@@ -42,13 +42,17 @@ def get_group_info():
 
 	if response.status_code == 200:
 		print('[+] Finished updating group info')
+		print("[!] Storing group info to file group_info.dat")
+		with open('group_info.dat', 'wb') as f:
+			pickle.dump(response.json(), f)
+		print("[+] Completed storing group info")
 		return response.json()
 	else:
 		print("[-] Failed updating group info")
 		return None
 
 # Set graph such that graph[area][x][y] = route from group x to group y
-def build_graph(group_info):
+def build_and_store_graph(group_info):
 	print("[!] Building complete graph of routes for each subarea...")
 	graph = {}
 	max_group_id = max([group['id'] for group in group_info])
@@ -133,13 +137,23 @@ def process(socket, request, group_info, graph):
 	print('[+] Projections sent')
 		
 def main():
+	# Start listening on port 31337
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 	s.bind(("0.0.0.0", 31337))
 	s.listen(5);
 
-	group_info = get_group_info()
+	# Create or load group info
+	if os.path.exists('group_info.dat'):
+		print('[!] group_info.dat exists. Loading file...')
+		with open('group_info.dat', 'rb') as f:
+			group_info = pickle.load(f)
+		print("[+] Completed loading group info")
+	else:
+		print("[!] group_info.dat does not exist")
+		group_info = get_and_store_group_info()
 
+	# Create or load graph
 	if os.path.exists('graph.dat'):
 		print("[!] graph.dat exists. Loading file...")
 		with open('graph.dat', 'rb') as f:
@@ -147,7 +161,7 @@ def main():
 		print("[+] Completed loading graph")
 	else:
 		print("[!] graph.dat does not exist")
-		graph = build_graph(group_info)
+		graph = build_and_store_graph(group_info)
 
 	while True:
 		(client_socket, address) = s.accept()
