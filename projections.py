@@ -133,7 +133,7 @@ def process(socket, request, group_info, graph):
 		print('[+] Estimated current location')
 
 	print('[!] Sending projections')
-	socket.send(json.dumps(projections).encode('utf-8'))
+	socket.sendall(json.dumps(projections).encode('utf-8'))
 	print('[+] Projections sent')
 
 def main():
