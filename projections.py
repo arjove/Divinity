@@ -8,12 +8,19 @@ import pickle
 import os
 import datetime
 import sys
+from cachetools import cached, TTLCache
+from cachetools.keys import hashkey
 
 #from secrets import GOOGLE_API_KEY
 GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY')
 gmaps = googlemaps.Client(key=GOOGLE_API_KEY)
 
 AREAS = 'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot'
+
+cache = TTLCache(maxsize=1024, ttl=24*60*60)
+
+def direction_key(*args, **kwargs):
+	return str(args)
 
 def walk(directions, seconds):
 	for step in directions[0]['legs'][0]['steps']:
@@ -42,10 +49,10 @@ def get_and_store_group_info():
 
 	if response.status_code == 200:
 		print('[+] Finished updating group info')
-		print("[!] Storing group info to file group_info.dat")
-		with open('group_info.dat', 'wb') as f:
-			pickle.dump(response.json(), f)
-		print("[+] Completed storing group info")
+		#print("[!] Storing group info to file group_info.dat")
+		#with open('group_info.dat', 'wb') as f:
+		#	pickle.dump(response.json(), f)
+		#print("[+] Completed storing group info")
 		return response.json()
 	else:
 		print("[-] Failed updating group info")
@@ -77,14 +84,11 @@ def build_and_store_graph(group_info):
 		pickle.dump(graph, f)
 	print(["[+] Completed storing graph"])
 
-# Creates distance list to groups in the subarea
-def group_dist(location, group_info, area):
+@cached(cache, key=direction_key)
+def group_dist(location, area_groups):
 	distances = []
 
-	for group in group_info:
-		if group['Subarea']['name'] != area:
-			continue
-
+	for group in area_groups:
 		directions_result = gmaps.directions(origin=location,
 			destination = group['location'],
 			mode = "walking",
@@ -93,6 +97,11 @@ def group_dist(location, group_info, area):
 		distances.append((group, directions_result))
 
 	return distances
+
+
+# Creates distance list to groups in the subarea
+def group_dist_wrapper(location, group_info, area):
+	return group_dist(location, [group for group in group_info if group['Subarea']['name'] == area])
 
 def process(socket, request, group_info, graph):
 	# Dictionary that contains an entry of following format per group
@@ -110,10 +119,9 @@ def process(socket, request, group_info, graph):
 		print('[!] Area:', area)
 		# Elapsed time since last seen
 		seconds = (datetime.datetime.now() - datetime.datetime.fromisoformat(entry['timestamp'][:-1])).total_seconds()
-		seconds = 2000
 		print('[!] Time since last seen:', seconds, 'sec')
 
-		distances = group_dist(entry['location'], group_info, area)
+		distances = group_dist_wrapper(entry['location'], group_info, area)
 		distances.sort(key=lambda x : x[1][0]['legs'][0]['distance']['value'])
 		nearest = [el for el in distances if el[0]['visits'] == min(visited)][0]
 
@@ -127,7 +135,7 @@ def process(socket, request, group_info, graph):
 			nearest[0]['visits'] += 1			
 			waypoints.append(nearest[0])
 
-			distances = group_dist((nearest[0]['latitude'], nearest[0]['longitude']), group_info, area)
+			distances = group_dist_wrapper((nearest[0]['latitude'], nearest[0]['longitude']), group_info, area)
 			distances.sort(key=lambda x : x[1][0]['legs'][0]['distance']['value'])
 			nearest = [el for el in distances if el[0]['visits'] == min(visited)][0]
 
@@ -144,16 +152,6 @@ def main():
 	s.bind(("0.0.0.0", 31337))
 	s.listen(5);
 
-	# Create or load group info
-	if os.path.exists('group_info.dat'):
-		print('[!] group_info.dat exists. Loading file...')
-		with open('group_info.dat', 'rb') as f:
-			group_info = pickle.load(f)
-		print("[+] Completed loading group info")
-	else:
-		print("[!] group_info.dat does not exist")
-		group_info = get_and_store_group_info()
-
 	# Create or load graph
 	if os.path.exists('graph.dat'):
 		print("[!] graph.dat exists. Loading file...")
@@ -167,6 +165,7 @@ def main():
 	while True:
 		(client_socket, address) = s.accept()
 		client_socket.settimeout(60)
+		group_info = get_and_store_group_info()
 		threading.Thread(target = handle_connection, args=(client_socket, address, group_info, graph)).start()
 
 if __name__ == "__main__":
