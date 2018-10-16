@@ -9,8 +9,8 @@ import os
 import datetime
 import sys
 
-from secrets import GOOGLE_API_KEY
-#GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY')
+#from secrets import GOOGLE_API_KEY
+GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY')
 gmaps = googlemaps.Client(key=GOOGLE_API_KEY)
 
 AREAS = 'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot'
