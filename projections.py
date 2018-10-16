@@ -9,8 +9,8 @@ import os
 import datetime
 import sys
 
-# from secrets import GOOGLE_API_KEY
-GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY')
+from secrets import GOOGLE_API_KEY
+#GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY')
 gmaps = googlemaps.Client(key=GOOGLE_API_KEY)
 
 AREAS = 'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot'
@@ -100,7 +100,7 @@ def process(socket, request, group_info, graph):
 	projections = {}
 
 	# List of groups that have been visited
-	visited = []
+	visited = [group['visits'] for group in group_info]
 
 	for entry in request['lastLocations']:
 		# List of groups visited after previous known location
@@ -110,12 +110,12 @@ def process(socket, request, group_info, graph):
 		print('[!] Area:', area)
 		# Elapsed time since last seen
 		seconds = (datetime.datetime.now() - datetime.datetime.fromisoformat(entry['timestamp'][:-1])).total_seconds()
-
+		seconds = 2000
 		print('[!] Time since last seen:', seconds, 'sec')
 
 		distances = group_dist(entry['location'], group_info, area)
 		distances.sort(key=lambda x : x[1][0]['legs'][0]['distance']['value'])
-		nearest = [el for el in distances if el[0] not in visited][0]
+		nearest = [el for el in distances if el[0]['visits'] == min(visited)][0]
 
 		while seconds > 0:
 			cur_step, seconds, step_progress = walk(nearest[1], seconds)
@@ -123,12 +123,13 @@ def process(socket, request, group_info, graph):
 				projections[area] = [waypoints, nearest[0], cur_step, step_progress]
 				continue
 
-			visited.append(nearest[0])
+			visited[group_info.index(nearest[0])] += 1
+			nearest[0]['visits'] += 1			
 			waypoints.append(nearest[0])
 
 			distances = group_dist((nearest[0]['latitude'], nearest[0]['longitude']), group_info, area)
 			distances.sort(key=lambda x : x[1][0]['legs'][0]['distance']['value'])
-			nearest = [el for el in distances if el[0] not in visited][0]
+			nearest = [el for el in distances if el[0]['visits'] == min(visited)][0]
 
 		print('[+] Estimated current location')
 
