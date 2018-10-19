@@ -77,18 +77,20 @@ def group_dist(location, area_groups):
 def group_dist_wrapper(location, group_info, area):
 	return group_dist(location, [group for group in group_info if group['Subarea']['name'] == area])
 
-def process(socket, request, group_info):
+def process(socket, request, group_info_param):
 	# List of options
 	projections = []
 
 	# Project location for 3 nearest groups
 	for target in range(3):
 		try:
+			# Create a copy of group_info_param
+			group_info = group_info_param[:] 
 			# Dictionary that contains an entry of following format per group
 			# [waypoint_groups, next group, current_step, step_progress, polylines]
 			option = {}
 
-			# List of groups that have been visited
+			# Number of visits per group
 			visited = [group['visits'] for group in group_info]
 
 			for entry in request['lastLocations']:
@@ -110,18 +112,24 @@ def process(socket, request, group_info):
 				while seconds > 0:
 					cur_step, lines, seconds, step_progress = walk(nearest[1], seconds)
 					polylines += lines
-					print("Seconds", seconds, "cur_step is none?", cur_step == None)
 					if cur_step is not None:
+						# We are not at our destination and time's up
 						option[area] = [waypoints, nearest[0], cur_step, step_progress, polylines]
-						continue
+					else:
+						# We are at our destination and there is time left
+						visited[group_info.index(nearest[0])] += 1 # In list of visit numbers, increment visited group
+						
+						# Append visisted group to waypoints
+						nearest[0]['visits'] += 1 
+						waypoints.append(nearest[0])
 
-					visited[group_info.index(nearest[0])] += 1
-					nearest[0]['visits'] += 1
-					waypoints.append(nearest[0])
+						# Increment value in group_info
+						group_info[group_info.index(nearest[0])]['visits'] += 1
 
-					distances = group_dist_wrapper((nearest[0]['latitude'], nearest[0]['longitude']), group_info, area)
-					distances.sort(key=lambda x : x[1][0]['legs'][0]['distance']['value'])
-					nearest = [el for el in distances if el[0]['visits'] == min(visited)][0]
+						# Compute new path from visited group to next nearest group
+						distances = group_dist_wrapper((nearest[0]['latitude'], nearest[0]['longitude']), group_info, area)
+						distances.sort(key=lambda x : x[1][0]['legs'][0]['distance']['value'])
+						nearest = [el for el in distances if el[0]['visits'] == min(visited)][0]
 
 			projections.append([option])
 			
