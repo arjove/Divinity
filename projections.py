@@ -83,7 +83,6 @@ def process(socket, request, group_info_param):
 
 	# Project location for 3 nearest groups
 	for target in range(3):
-		try:
 			# Create a copy of group_info_param
 			group_info = group_info_param[:] 
 			# Dictionary that contains an entry of following format per group
@@ -105,39 +104,41 @@ def process(socket, request, group_info_param):
 				seconds = (datetime.datetime.now() - datetime.datetime.fromisoformat(entry['timestamp'][:-1])).total_seconds()
 				print('[!] Time since last seen:', seconds, 'sec')
 
-				distances = group_dist_wrapper(entry['location'], group_info, area)
-				distances.sort(key=lambda x : x[1][0]['legs'][0]['distance']['value'])
-				nearest = [el for el in distances if el[0]['visits'] == min(visited)][target]
+				try:
+					distances = group_dist_wrapper(entry['location'], group_info, area)
+					distances.sort(key=lambda x : x[1][0]['legs'][0]['distance']['value'])
+					nearest = [el for el in distances if el[0]['visits'] == min(visited)][target]
 
-				while seconds > 0:
-					cur_step, lines, seconds, step_progress = walk(nearest[1], seconds)
-					polylines += lines
-					if cur_step is not None:
-						# We are not at our destination and time's up
-						option[area] = [waypoints, nearest[0], cur_step, step_progress, polylines]
-					else:
-						# We are at our destination and there is time left
-						visited[group_info.index(nearest[0])] += 1 # In list of visit numbers, increment visited group
-						
-						# Append visisted group to waypoints
-						nearest[0]['visits'] += 1 
-						waypoints.append(nearest[0])
+					while seconds > 0:
+						cur_step, lines, seconds, step_progress = walk(nearest[1], seconds)
+						polylines += lines
+						if cur_step is not None:
+							# We are not at our destination and time's up
+							option[area] = [waypoints, nearest[0], cur_step, step_progress, polylines]
+						else:
+							# We are at our destination and there is time left
+							visited[group_info.index(nearest[0])] += 1 # In list of visit numbers, increment visited group
+							
+							# Append visisted group to waypoints
+							nearest[0]['visits'] += 1 
+							waypoints.append(nearest[0])
 
-						# Increment value in group_info
-						group_info[group_info.index(nearest[0])]['visits'] += 1
+							# Increment value in group_info
+							group_info[group_info.index(nearest[0])]['visits'] += 1
 
-						# Compute new path from visited group to next nearest group
-						distances = group_dist_wrapper((nearest[0]['latitude'], nearest[0]['longitude']), group_info, area)
-						distances.sort(key=lambda x : x[1][0]['legs'][0]['distance']['value'])
-						nearest = [el for el in distances if el[0]['visits'] == min(visited)][0]
+							# Compute new path from visited group to next nearest group
+							distances = group_dist_wrapper((nearest[0]['latitude'], nearest[0]['longitude']), group_info, area)
+							distances.sort(key=lambda x : x[1][0]['legs'][0]['distance']['value'])
+							nearest = [el for el in distances if el[0]['visits'] == min(visited)][0]
+
+				except Exception as e:
+					print("[-] Something wrent wrong. Skipping this target. Error:", e)
+					option[area] = None
+					continue
 
 			projections.append([option])
 			
-		except Exception as e:
-			print("[-] Something wrent wrong. Skipping this target. Error:", e)
-			continue
-
-		print('[+] Estimated current location')
+			print('[+] Estimated current location')
 
 	print('[!] Sending projections')
 	socket.sendall(json.dumps(projections).encode('utf-8'))
