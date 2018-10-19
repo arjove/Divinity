@@ -116,14 +116,15 @@ def process(socket, request, group_info):
 						continue
 
 					visited[group_info.index(nearest[0])] += 1
-					nearest[0]['visits'] += 1			
+					nearest[0]['visits'] += 1
 					waypoints.append(nearest[0])
 
 					distances = group_dist_wrapper((nearest[0]['latitude'], nearest[0]['longitude']), group_info, area)
 					distances.sort(key=lambda x : x[1][0]['legs'][0]['distance']['value'])
 					nearest = [el for el in distances if el[0]['visits'] == min(visited)][0]
 
-				projections.append([option])
+			projections.append([option])
+			
 		except Exception as e:
 			print("[-] Something wrent wrong. Skipping this target. Error:", e)
 			continue
