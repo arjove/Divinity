@@ -123,7 +123,7 @@ def process(socket, request, group_info):
 					distances.sort(key=lambda x : x[1][0]['legs'][0]['distance']['value'])
 					nearest = [el for el in distances if el[0]['visits'] == min(visited)][0]
 
-				projections.append(option)
+				projections.append([option])
 		except Exception as e:
 			print("[-] Something wrent wrong. Skipping this target. Error:", e)
 			continue
