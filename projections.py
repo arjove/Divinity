@@ -6,8 +6,8 @@ import googlemaps
 from cachetools import cached, LRUCache
 from cachetools.keys import hashkey
 
-#from secrets import GOOGLE_API_KEY
-GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY')
+from secrets import GOOGLE_API_KEY
+#GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY')
 gmaps = googlemaps.Client(key=GOOGLE_API_KEY)
 
 AREAS = 'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot'
@@ -110,6 +110,7 @@ def process(socket, request, group_info):
 				while seconds > 0:
 					cur_step, lines, seconds, step_progress = walk(nearest[1], seconds)
 					polylines += lines
+					print("Seconds", seconds, "cur_step is none?", cur_step == None)
 					if cur_step is not None:
 						option[area] = [waypoints, nearest[0], cur_step, step_progress, polylines]
 						continue
@@ -122,9 +123,9 @@ def process(socket, request, group_info):
 					distances.sort(key=lambda x : x[1][0]['legs'][0]['distance']['value'])
 					nearest = [el for el in distances if el[0]['visits'] == min(visited)][0]
 
-					projections.append(option)
+				projections.append(option)
 		except Exception as e:
-			print("Whoopsie. Something wrent wrong. Skipping this target. Error:", e)
+			print("[-] Something wrent wrong. Skipping this target. Error:", e)
 			continue
 
 		print('[+] Estimated current location')
