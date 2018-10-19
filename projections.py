@@ -83,46 +83,48 @@ def process(socket, request, group_info):
 
 	# Project location for 3 nearest groups
 	for target in range(3):
-		# Dictionary that contains an entry of following format per group
-		# [waypoint_groups, next group, current_step, step_progress, polylines]
-		option = {}
+		try:
+			# Dictionary that contains an entry of following format per group
+			# [waypoint_groups, next group, current_step, step_progress, polylines]
+			option = {}
 
-		# List of groups that have been visited
-		visited = [group['visits'] for group in group_info]
+			# List of groups that have been visited
+			visited = [group['visits'] for group in group_info]
 
-		for entry in request['lastLocations']:
-			# List of groups visited after previous known location
-			waypoints = []
-			# List of lines that are on the travelled and future path
-			polylines = []
+			for entry in request['lastLocations']:
+				# List of groups visited after previous known location
+				waypoints = []
+				# List of lines that are on the travelled and future path
+				polylines = []
 
-			area = entry['subarea'].capitalize()
-			print('[!] Area:', area)
-			# Elapsed time since last seen
-			seconds = (datetime.datetime.now() - datetime.datetime.fromisoformat(entry['timestamp'][:-1])).total_seconds()
-			seconds = 2000
-			print('[!] Time since last seen:', seconds, 'sec')
+				area = entry['subarea'].capitalize()
+				print('[!] Area:', area)
+				# Elapsed time since last seen
+				seconds = (datetime.datetime.now() - datetime.datetime.fromisoformat(entry['timestamp'][:-1])).total_seconds()
+				print('[!] Time since last seen:', seconds, 'sec')
 
-			distances = group_dist_wrapper(entry['location'], group_info, area)
-			distances.sort(key=lambda x : x[1][0]['legs'][0]['distance']['value'])
-			nearest = [el for el in distances if el[0]['visits'] == min(visited)][target]
-
-			while seconds > 0:
-				cur_step, lines, seconds, step_progress = walk(nearest[1], seconds)
-				polylines += lines
-				if cur_step is not None:
-					option[area] = [waypoints, nearest[0], cur_step, step_progress, polylines]
-					continue
-
-				visited[group_info.index(nearest[0])] += 1
-				nearest[0]['visits'] += 1			
-				waypoints.append(nearest[0])
-
-				distances = group_dist_wrapper((nearest[0]['latitude'], nearest[0]['longitude']), group_info, area)
+				distances = group_dist_wrapper(entry['location'], group_info, area)
 				distances.sort(key=lambda x : x[1][0]['legs'][0]['distance']['value'])
-				nearest = [el for el in distances if el[0]['visits'] == min(visited)][0]
+				nearest = [el for el in distances if el[0]['visits'] == min(visited)][target]
 
-				projections.append(option)
+				while seconds > 0:
+					cur_step, lines, seconds, step_progress = walk(nearest[1], seconds)
+					polylines += lines
+					if cur_step is not None:
+						option[area] = [waypoints, nearest[0], cur_step, step_progress, polylines]
+						continue
+
+					visited[group_info.index(nearest[0])] += 1
+					nearest[0]['visits'] += 1			
+					waypoints.append(nearest[0])
+
+					distances = group_dist_wrapper((nearest[0]['latitude'], nearest[0]['longitude']), group_info, area)
+					distances.sort(key=lambda x : x[1][0]['legs'][0]['distance']['value'])
+					nearest = [el for el in distances if el[0]['visits'] == min(visited)][0]
+
+					projections.append(option)
+		except Exception as e:
+			print("Whoopsie. Something wrent wrong. Skipping this target. Error:", e)
 
 			print('[+] Estimated current location')
 
