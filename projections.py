@@ -100,7 +100,6 @@ def process(socket, request, group_info):
 			print('[!] Area:', area)
 			# Elapsed time since last seen
 			seconds = (datetime.datetime.now() - datetime.datetime.fromisoformat(entry['timestamp'][:-1])).total_seconds()
-			seconds = 2000
 			print('[!] Time since last seen:', seconds, 'sec')
 
 			distances = group_dist_wrapper(entry['location'], group_info, area)
@@ -115,7 +114,7 @@ def process(socket, request, group_info):
 					continue
 
 				visited[group_info.index(nearest[0])] += 1
-				nearest[0]['visits'] += 1			
+				nearest[0]['visits'] += 1
 				waypoints.append(nearest[0])
 
 				distances = group_dist_wrapper((nearest[0]['latitude'], nearest[0]['longitude']), group_info, area)
