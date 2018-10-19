@@ -125,8 +125,9 @@ def process(socket, request, group_info):
 					projections.append(option)
 		except Exception as e:
 			print("Whoopsie. Something wrent wrong. Skipping this target. Error:", e)
+			continue
 
-			print('[+] Estimated current location')
+		print('[+] Estimated current location')
 
 	print('[!] Sending projections')
 	socket.sendall(json.dumps(projections).encode('utf-8'))

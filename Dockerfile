@@ -5,7 +5,7 @@ WORKDIR /pythonapp
 ADD projections.py /
 ADD . .
 
-RUN pip install -U googlemaps
+RUN pip install -U googlemaps cachetools
 
 VOLUME /pythonapp
 
