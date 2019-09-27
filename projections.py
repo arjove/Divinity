@@ -7,8 +7,8 @@ from cachetools import cached, LRUCache
 from cachetools.keys import hashkey
 
 #from secrets import GOOGLE_API_KEY
-GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY')
-gmaps = googlemaps.Client(key=GOOGLE_API_KEY)
+GOOGLE_AUTH_TOKEN = os.environ.get('GOOGLE_AUTH_TOKEN')
+gmaps = googlemaps.Client(key=GOOGLE_AUTH_TOKEN)
 
 AREAS = 'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot'
 
