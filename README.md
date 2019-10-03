@@ -1,6 +1,6 @@
 # Projections
 Expose port 31337
-Add process env `GOOGLE_API_KEY`.
+Add process env `GOOGLE_SERVER_AUTH_TOKEN`.
 
 ## API-request
 JSON-request
