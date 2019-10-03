@@ -47,7 +47,7 @@ def handle_connection(client_socket, address, group_info):
 
 def get_group_info():
 	print("[!] Updating group info...")
-	api_url = "https://www.eej.moe/api/{0}".format("group")
+	api_url = "https://jotihunt.scouting-ijsselgroep.nl/api/{0}".format("group")
 
 	response = requests.get(api_url, timeout=(1,1))
 
