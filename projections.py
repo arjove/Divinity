@@ -7,8 +7,8 @@ from cachetools import cached, LRUCache
 from cachetools.keys import hashkey
 
 #from secrets import GOOGLE_API_KEY
-GOOGLE_AUTH_TOKEN = os.environ.get('GOOGLE_AUTH_TOKEN')
-gmaps = googlemaps.Client(key=GOOGLE_AUTH_TOKEN)
+GOOGLE_SERVER_AUTH_TOKEN = os.environ.get('GOOGLE_SERVER_AUTH_TOKEN')
+gmaps = googlemaps.Client(key=GOOGLE_SERVER_AUTH_TOKEN)
 
 AREAS = 'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot'
 
@@ -47,7 +47,7 @@ def handle_connection(client_socket, address, group_info):
 
 def get_group_info():
 	print("[!] Updating group info...")
-	api_url = "https://www.eej.moe/api/{0}".format("group")
+	api_url = "https://jotihunt.scouting-ijsselgroep.nl/api/{0}".format("group")
 
 	response = requests.get(api_url, timeout=(1,1))
 
@@ -84,7 +84,7 @@ def process(socket, request, group_info_param):
 	# Project location for 3 nearest groups
 	for target in range(3):
 			# Create a copy of group_info_param
-			group_info = group_info_param[:] 
+			group_info = group_info_param[:]
 			# Dictionary that contains an entry of following format per group
 			# [waypoint_groups, next group, current_step, step_progress, polylines]
 			option = {}
@@ -118,9 +118,9 @@ def process(socket, request, group_info_param):
 						else:
 							# We are at our destination and there is time left
 							visited[group_info.index(nearest[0])] += 1 # In list of visit numbers, increment visited group
-							
+
 							# Append visisted group to waypoints
-							nearest[0]['visits'] += 1 
+							nearest[0]['visits'] += 1
 							waypoints.append(nearest[0])
 
 							# Increment value in group_info
@@ -137,7 +137,7 @@ def process(socket, request, group_info_param):
 					continue
 
 			projections.append([option])
-			
+
 			print('[+] Estimated current location')
 
 	print('[!] Sending projections')
