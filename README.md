@@ -1,5 +1,5 @@
 # Divinity
-![Build](https://github.com/ScoutingIJsselgroep/Divinity/actions/workflows/master/badge.svg)
+![Build status](https://github.com/ScoutingIJsselgroep/Divinity/actions/workflows/master.yml/badge.svg)
 
 Expose port 31337
 Add process env `GOOGLE_SERVER_AUTH_TOKEN`.
