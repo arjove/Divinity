@@ -45,7 +45,7 @@ def handle_connection(client_socket, address, group_info):
 
 def get_group_info():
 	print("[!] Updating group info...")
-	api_url = "http://{0}/api/group".format(os.environ.get('JOTIHUNT_HOST'))
+	api_url = "{0}/api/group".format(os.environ.get('JOTIHUNT_HOST'))
 
 	response = requests.get(api_url, timeout=(1,1))
 
