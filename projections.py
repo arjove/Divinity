@@ -8,7 +8,7 @@ from cachetools.keys import hashkey
 
 gmaps = googlemaps.Client(key=os.environ.get('GOOGLE_SERVER_AUTH_TOKEN'))
 
-AREAS = 'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot'
+AREAS = 'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Alpha 2', 'Bravo 2', 'Charlie 2', 'Delta 2', 'Echo 2', 'Foxtrot 2'
 
 cache = LRUCache(maxsize=2**16)
 
