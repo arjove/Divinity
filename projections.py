@@ -8,7 +8,7 @@ from cachetools.keys import hashkey
 
 gmaps = googlemaps.Client(key=os.environ.get('GOOGLE_SERVER_AUTH_TOKEN'))
 
-AREAS = 'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot'
+AREAS = 'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Alpha 2', 'Bravo 2', 'Charlie 2', 'Delta 2', 'Echo 2', 'Foxtrot 2'
 
 cache = LRUCache(maxsize=2**16)
 
@@ -73,7 +73,7 @@ def group_dist(location, area_groups):
 
 # Creates distance list to groups in the subarea
 def group_dist_wrapper(location, group_info, area):
-	return group_dist(location, [group for group in group_info if group['Subarea']['name'] == area])
+	return group_dist(location, [group for group in group_info if group['Subarea']['name'][:4] == area[:4] or group['Subarea']['name'] == "Niet ingesteld"])
 
 def process(socket, request, group_info_param):
 	# List of options
