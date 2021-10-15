@@ -73,7 +73,7 @@ def group_dist(location, area_groups):
 
 # Creates distance list to groups in the subarea
 def group_dist_wrapper(location, group_info, area):
-	return group_dist(location, [group for group in group_info if group['Subarea']['name'] == area])
+	return group_dist(location, [group for group in group_info if group['Subarea']['name'][:4] == area[:4] or group['Subarea']['name'] == "Niet ingesteld"])
 
 def process(socket, request, group_info_param):
 	# List of options
